@@ -7,11 +7,11 @@ import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-import kotlin.io.resolve
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -37,4 +37,10 @@ object ImageLoaderModule {
             .crossfade(true)
             .build()
     }
+}
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface ImageLoaderEntryPoint {
+    fun imageLoader(): ImageLoader
 }

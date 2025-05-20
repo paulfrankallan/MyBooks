@@ -30,13 +30,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.Coil
 import coil.ImageLoader
 import com.paulallan.mybooks.R
+import com.paulallan.mybooks.app.di.ImageLoaderEntryPoint
 import com.paulallan.mybooks.app.theme.MyBooksTheme
 import com.paulallan.mybooks.domain.model.Book
 import com.paulallan.mybooks.domain.model.BookListType
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
+import com.paulallan.mybooks.feature.details.presentation.BookDetailsBottomSheet
 import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.components.SingletonComponent
 
 @Composable
 fun BookListScreen(
@@ -55,7 +54,9 @@ fun BookListScreen(
 
     BookListContent(
         state = state,
+        onBookClick = viewModel::selectBook,
         onBookListTypeSelected = viewModel::changeBookListType,
+        onDismissBottomSheet = viewModel::clearSelectedBook,
         imageLoader = imageLoader,
         modifier = modifier
     )
@@ -64,7 +65,9 @@ fun BookListScreen(
 @Composable
 fun BookListContent(
     state: BookListState,
+    onBookClick: (Book) -> Unit,
     onBookListTypeSelected: (BookListType) -> Unit,
+    onDismissBottomSheet: () -> Unit,
     imageLoader: ImageLoader,
     modifier: Modifier = Modifier
 ) {
@@ -112,10 +115,18 @@ fun BookListContent(
                         BookListItem(
                             book = book,
                             imageLoader = imageLoader,
-                            onClick = {  }
+                            onClick = { onBookClick(book) }
                         )
                     }
                 }
+            }
+
+            state.selectedBook?.let { book ->
+                BookDetailsBottomSheet(
+                    book = book,
+                    imageLoader = imageLoader,
+                    onDismissBottomSheet = onDismissBottomSheet,
+                )
             }
         }
     }
@@ -149,15 +160,11 @@ fun BookListScreenPreview() {
                     )
                 )
             ),
+            onBookClick = {},
             onBookListTypeSelected = {},
+            onDismissBottomSheet = {},
             imageLoader = Coil.imageLoader(LocalContext.current),
             modifier = Modifier.fillMaxSize()
         )
     }
-}
-
-@EntryPoint
-@InstallIn(SingletonComponent::class)
-interface ImageLoaderEntryPoint {
-    fun imageLoader(): ImageLoader
 }

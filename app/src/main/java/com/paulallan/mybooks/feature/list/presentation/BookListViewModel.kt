@@ -1,6 +1,7 @@
 package com.paulallan.mybooks.feature.list.presentation
 
 import androidx.lifecycle.ViewModel
+import com.paulallan.mybooks.domain.model.Book
 import com.paulallan.mybooks.domain.model.BookListType
 import com.paulallan.mybooks.domain.usecase.GetAlreadyReadBooksUseCase
 import com.paulallan.mybooks.domain.usecase.GetCurrentlyReadingBooksUseCase
@@ -46,6 +47,14 @@ class BookListViewModel @Inject constructor(
                     // Handle error
                 }
             )
+    }
+
+    fun selectBook(book: Book) {
+        _state.update { it.copy(selectedBook = book) }
+    }
+
+    fun clearSelectedBook() {
+        _state.update { it.copy(selectedBook = null) }
     }
 
     fun changeBookListType(type: BookListType) {

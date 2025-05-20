@@ -6,4 +6,5 @@ import com.paulallan.mybooks.domain.model.BookListType
 data class BookListState(
     val books: List<Book> = emptyList(),
     val bookListType: BookListType = BookListType.WANT_TO_READ,
+    val selectedBook: Book? = null,
 )

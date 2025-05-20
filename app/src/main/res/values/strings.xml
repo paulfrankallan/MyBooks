@@ -15,4 +15,8 @@
     <string name="book_cover_content_description">Book cover for %1$s</string>
     <string name="loading">Loading…</string>
     <string name="error_oops">Oops!</string>
+    
+    <!-- Book Details -->
+    <string name="book_author_prefix">By %1$s</string>
+    <string name="book_first_published">First published: %1$s</string>
 </resources>
