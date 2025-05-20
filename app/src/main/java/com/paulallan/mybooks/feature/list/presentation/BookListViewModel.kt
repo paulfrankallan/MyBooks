@@ -30,10 +30,6 @@ class BookListViewModel @Inject constructor(
 
     private val disposables = CompositeDisposable()
 
-    init {
-        loadBooks()
-    }
-
     override fun onStart(owner: LifecycleOwner) {
         if (_state.value.books.isEmpty()) {
             loadBooks()
@@ -45,6 +41,8 @@ class BookListViewModel @Inject constructor(
     }
 
     fun loadBooks() {
+        disposables.clear()
+
         _state.update {
             it.copy(
                 isLoading = true,
@@ -76,14 +74,21 @@ class BookListViewModel @Inject constructor(
             return
         }
 
+        disposables.clear()
+
         _state.update {
             it.copy(
                 bookListType = type,
                 books = emptyList(),
+                isLoading = true,
+                error = null,
+                currentPage = 1,
+                hasMoreData = true,
+                totalCount = 0
             )
         }
 
-        loadBooksForCurrentType()
+        loadBooksForCurrentType(1)
     }
 
     private fun loadBooksForCurrentType(page: Int = 1, isLoadingMore: Boolean = false) {
@@ -118,8 +123,9 @@ class BookListViewModel @Inject constructor(
                 books
             }
 
-            val totalBooksLoaded = updatedBooks.size
-            val hasMoreData = totalBooksLoaded < totalCount
+            // Calculate if there's more data based on the current page and total count
+            // This is more accurate than using the size of the updated books list
+            val hasMoreData = page * ApiConstants.DEFAULT_PAGE_SIZE < totalCount
 
             currentState.copy(
                 books = updatedBooks,
@@ -137,7 +143,7 @@ class BookListViewModel @Inject constructor(
             it.copy(
                 error = error.message,
                 isLoading = false,
-                isLoadingMore = false
+                isLoadingMore = false,
             )
         }
     }

@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -124,19 +125,23 @@ private fun BookListContent(
                             )
                         }
                     }
+
                     state.error != null -> {
                         Box(
                             modifier = Modifier
-                                .fillMaxSize(),
+                                .fillMaxSize()
+                                .padding(16.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = stringResource(R.string.error_message, state.error),
+                                textAlign = TextAlign.Center,
                                 color = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.padding(16.dp)
                             )
                         }
                     }
+
                     else -> {
                         Box(modifier = Modifier.weight(1f)) {
                             LazyColumn(
@@ -144,7 +149,10 @@ private fun BookListContent(
                                     .fillMaxSize()
                                     .padding(horizontal = 12.dp)
                             ) {
-                                items(state.books) { book ->
+                                items(
+                                    items = state.books,
+                                    key = { book -> book.id }
+                                ) { book ->
                                     BookListItem(
                                         book = book,
                                         imageLoader = imageLoader,

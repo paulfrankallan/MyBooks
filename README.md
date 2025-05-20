@@ -43,6 +43,9 @@ The application follows a clean architecture approach with three main layers:
 - **Domain Layer**: Use cases, repository interfaces, and domain models
 - **Data Layer**: Repository implementations, API services, and data models
 
+- In a larger production application, the architecture would be fully modularized with separate modules for each feature and shared components.
+- Data and Domain layers would also be pushed into their relevant feature modules where necessary.
+
 ### State Management
 - Using Kotlin Flow for UI state management
 - Comprehensive state handling for loading, error, and success states

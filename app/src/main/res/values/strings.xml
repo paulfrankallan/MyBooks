@@ -4,7 +4,7 @@
     
     <!-- Book List Screen -->
     <string name="books_title">My Books</string>
-    <string name="error_message">Error: %1$s</string>
+    <string name="error_message">Error: %1$s (In a production app a user friendly error message would be used)</string>
     
     <!-- Book List Type -->
     <string name="book_list_type_want_to_read">Want to Read</string>
