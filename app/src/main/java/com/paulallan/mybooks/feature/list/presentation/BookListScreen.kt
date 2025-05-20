@@ -19,26 +19,44 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.Coil
+import coil.ImageLoader
 import com.paulallan.mybooks.R
 import com.paulallan.mybooks.app.theme.MyBooksTheme
+import com.paulallan.mybooks.domain.model.Book
 import com.paulallan.mybooks.domain.model.BookListType
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 
 @Composable
 fun BookListScreen(
     modifier: Modifier = Modifier,
     viewModel: BookListViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val imageLoader = remember {
+        EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            ImageLoaderEntryPoint::class.java
+        ).imageLoader()
+    }
+
     val state by viewModel.state.collectAsState()
 
     BookListContent(
         state = state,
         onBookListTypeSelected = viewModel::changeBookListType,
+        imageLoader = imageLoader,
         modifier = modifier
     )
 }
@@ -47,6 +65,7 @@ fun BookListScreen(
 fun BookListContent(
     state: BookListState,
     onBookListTypeSelected: (BookListType) -> Unit,
+    imageLoader: ImageLoader,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -90,9 +109,10 @@ fun BookListContent(
                     items(
                         state.books,
                     ) { book ->
-                        Text(
-                            text = book.title,
-                            color = MaterialTheme.colorScheme.onSurface,
+                        BookListItem(
+                            book = book,
+                            imageLoader = imageLoader,
+                            onClick = {  }
                         )
                     }
                 }
@@ -105,6 +125,39 @@ fun BookListContent(
 @Composable
 fun BookListScreenPreview() {
     MyBooksTheme {
-        BookListScreen()
+        BookListContent(
+            state = BookListState(
+                bookListType = BookListType.WANT_TO_READ,
+                books = listOf(
+                    Book(
+                        id = "1",
+                        title = "The Great Gatsby",
+                        authors = listOf("F. Scott Fitzgerald"),
+                        coverUrl = ""
+                    ),
+                    Book(
+                        id = "2",
+                        title = "1984",
+                        authors = listOf("George Orwell"),
+                        coverUrl = ""
+                    ),
+                    Book(
+                        id = "3",
+                        title = "To Kill a Mockingbird",
+                        authors = listOf("Harper Lee"),
+                        coverUrl = ""
+                    )
+                )
+            ),
+            onBookListTypeSelected = {},
+            imageLoader = Coil.imageLoader(LocalContext.current),
+            modifier = Modifier.fillMaxSize()
+        )
     }
+}
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface ImageLoaderEntryPoint {
+    fun imageLoader(): ImageLoader
 }
