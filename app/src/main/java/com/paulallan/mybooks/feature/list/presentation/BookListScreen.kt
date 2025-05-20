@@ -4,7 +4,9 @@ package com.paulallan.mybooks.feature.list.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.paulallan.mybooks.R
 import com.paulallan.mybooks.app.theme.MyBooksTheme
+import com.paulallan.mybooks.domain.model.BookListType
 
 @Composable
 fun BookListScreen(
@@ -35,6 +38,7 @@ fun BookListScreen(
 
     BookListContent(
         state = state,
+        onBookListTypeSelected = viewModel::changeBookListType,
         modifier = modifier
     )
 }
@@ -42,6 +46,7 @@ fun BookListScreen(
 @Composable
 fun BookListContent(
     state: BookListState,
+    onBookListTypeSelected: (BookListType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -68,18 +73,28 @@ fun BookListContent(
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(paddingValues)
         ) {
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 12.dp)
             ) {
-                items(
-                    state.books,
-                ) { book ->
-                    Text(
-                        text = book.title,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
+                BookListTypeSelector(
+                    selectedType = state.bookListType,
+                    onTypeSelected = onBookListTypeSelected,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    items(
+                        state.books,
+                    ) { book ->
+                        Text(
+                            text = book.title,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
                 }
             }
         }
