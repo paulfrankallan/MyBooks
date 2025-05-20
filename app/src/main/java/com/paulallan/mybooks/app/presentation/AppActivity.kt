@@ -10,7 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.paulallan.mybooks.app.theme.MyBooksTheme
-import com.paulallan.mybooks.feature.list.BookListScreen
+import com.paulallan.mybooks.feature.list.presentation.BookListScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

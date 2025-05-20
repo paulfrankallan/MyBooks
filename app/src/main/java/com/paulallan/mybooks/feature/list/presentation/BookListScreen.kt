@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.paulallan.mybooks.feature.list
+package com.paulallan.mybooks.feature.list.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -15,6 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -29,11 +31,19 @@ fun BookListScreen(
     modifier: Modifier = Modifier,
     viewModel: BookListViewModel = hiltViewModel()
 ) {
-    BookListContent(modifier = modifier)
+    val state by viewModel.state.collectAsState()
+
+    BookListContent(
+        state = state,
+        modifier = modifier
+    )
 }
 
 @Composable
-fun BookListContent(modifier: Modifier = Modifier) {
+fun BookListContent(
+    state: BookListState,
+    modifier: Modifier = Modifier
+) {
     Scaffold(
         containerColor = Color.Transparent,
         modifier = modifier.fillMaxSize(),
@@ -64,10 +74,10 @@ fun BookListContent(modifier: Modifier = Modifier) {
                     .padding(horizontal = 12.dp)
             ) {
                 items(
-                    listOf("Book 1", "Book 2", "Book 3", "Book 4", "Book 5", "Book 6", "Book 7", "Book 8", "Book 9", "Book 10")
+                    state.books,
                 ) { book ->
                     Text(
-                        text = book,
+                        text = book.title,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
