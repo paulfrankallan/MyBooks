@@ -76,7 +76,7 @@ The application follows a clean architecture approach with three main layers:
 
 ### Performance
 - Consideration was given to ensuring long-running tasks are performed off the main thread
-
+- Images sizes are chosen based on the UI component; medium for smaller list item images and large for book details view.
 
 ## Trade-offs
 
@@ -116,5 +116,4 @@ The application follows a clean architecture approach with three main layers:
 
 ### Performance
 - Implement more sophisticated caching strategies
-- Optimize image loading for different screen sizes, or even different UI configurations
 - Add performance monitoring using Firebase Performance
