@@ -1,20 +1,8 @@
 package com.paulallan.mybooks.feature.details.presentation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +16,7 @@ import coil.ImageLoader
 import com.paulallan.mybooks.R
 import com.paulallan.mybooks.domain.model.Book
 import com.paulallan.mybooks.feature.shared.presentation.BookCoverImage
+import com.paulallan.mybooks.feature.shared.presentation.CoverSize
 
 @ExperimentalMaterial3Api
 @Composable
@@ -81,7 +70,8 @@ private fun BookDetailContent(
                     coverWidth = 500,
                     coverHeight = 700,
                     contentScale = ContentScale.Fit,
-                    imageLoader = imageLoader
+                    imageLoader = imageLoader,
+                    coverSize = CoverSize.LARGE
                 )
             }
         }
@@ -125,7 +115,7 @@ fun BookDetailsBottomSheetPreview() {
         id = "1",
         title = "The Great Gatsby",
         authors = listOf("F. Scott Fitzgerald"),
-        coverUrl = "",
+        coverId = null,
         firstPublishedYear = "1925"
     )
     BookDetailContent(

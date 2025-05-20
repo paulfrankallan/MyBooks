@@ -30,6 +30,11 @@ class BookListViewModel @Inject constructor(
 
     private val disposables = CompositeDisposable()
 
+    init {
+        // Load page 1 on initialization
+        loadBooks()
+    }
+
     override fun onStart(owner: LifecycleOwner) {
         if (_state.value.books.isEmpty()) {
             loadBooks()

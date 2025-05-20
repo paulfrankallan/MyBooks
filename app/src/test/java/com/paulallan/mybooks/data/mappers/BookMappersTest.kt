@@ -5,8 +5,8 @@ import com.paulallan.mybooks.data.model.BookWork
 import com.paulallan.mybooks.data.model.ReadingLogEntry
 import com.paulallan.mybooks.domain.model.Book
 import com.paulallan.mybooks.domain.model.BookListResult
-import org.junit.Test
 import org.junit.Assert.assertEquals
+import org.junit.Test
 
 class BookMappersTest {
 
@@ -53,14 +53,14 @@ class BookMappersTest {
                 title = "Title 1",
                 authors = listOf("Author One", "Author Two"),
                 firstPublishedYear = "2020",
-                coverUrl = "https://covers.openlibrary.org/b/id/12345-L.jpg"
+                coverId = 12345L
             ),
             Book(
                 id = "key2",
                 title = "Title 2",
                 authors = listOf("Author Three"),
                 firstPublishedYear = "2021",
-                coverUrl = "https://covers.openlibrary.org/b/id/67890-L.jpg"
+                coverId = 67890L
             )
         )
         val expectedResult = BookListResult(
@@ -74,14 +74,14 @@ class BookMappersTest {
         // Assert
         assertEquals(expectedResult.totalCount, result.totalCount)
         assertEquals(expectedResult.books.size, result.books.size)
-        
+
         // Verify each book's properties
         for (i in expectedResult.books.indices) {
             assertEquals(expectedResult.books[i].id, result.books[i].id)
             assertEquals(expectedResult.books[i].title, result.books[i].title)
             assertEquals(expectedResult.books[i].authors, result.books[i].authors)
             assertEquals(expectedResult.books[i].firstPublishedYear, result.books[i].firstPublishedYear)
-            assertEquals(expectedResult.books[i].coverUrl, result.books[i].coverUrl)
+            assertEquals(expectedResult.books[i].coverId, result.books[i].coverId)
         }
     }
 
@@ -114,14 +114,14 @@ class BookMappersTest {
         // Assert
         assertEquals(0, result.totalCount)
         assertEquals(1, result.books.size)
-        
+
         val book = result.books[0]
         // The key should be "unknown_key_" followed by the hash code
         assert(book.id.startsWith("unknown_key_"))
         assertEquals("", book.title)
         assertEquals(emptyList<String>(), book.authors)
         assertEquals("", book.firstPublishedYear)
-        assertEquals(null, book.coverUrl)
+        assertEquals(null, book.coverId)
     }
 
     @Test

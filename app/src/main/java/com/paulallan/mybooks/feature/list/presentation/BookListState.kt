@@ -16,4 +16,7 @@ data class BookListState(
 ) {
     val hasNoMoreData: Boolean
         get() = !hasMoreData
+
+    val canLoadMore: Boolean
+        get() = !isLoading && !isLoadingMore && hasMoreData
 }

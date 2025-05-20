@@ -31,14 +31,14 @@ class GetWantToReadBooksUseCaseTest {
                 title = "Book 1",
                 authors = listOf("Author 1"),
                 firstPublishedYear = "2021",
-                coverUrl = "https://example.com/cover1.jpg"
+                coverId = 12345L
             ),
             Book(
                 id = "2",
                 title = "Book 2",
                 authors = listOf("Author 2"),
                 firstPublishedYear = "2022",
-                coverUrl = "https://example.com/cover2.jpg"
+                coverId = 67890L
             )
         )
         val totalCount = 2
@@ -66,7 +66,7 @@ class GetWantToReadBooksUseCaseTest {
                 title = "Book 1",
                 authors = listOf("Author 1"),
                 firstPublishedYear = "2021",
-                coverUrl = "https://example.com/cover1.jpg"
+                coverId = 12345L
             )
         )
         val totalCount = 1

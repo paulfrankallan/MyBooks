@@ -1,13 +1,7 @@
 package com.paulallan.mybooks.feature.list.presentation
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -22,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import com.paulallan.mybooks.domain.model.Book
 import com.paulallan.mybooks.feature.shared.presentation.BookCoverImage
+import com.paulallan.mybooks.feature.shared.presentation.CoverSize
 
 @Composable
 fun BookListItem(
@@ -56,7 +51,8 @@ fun BookListItem(
                     book = book,
                     coverWidth = 100,
                     coverHeight = 140,
-                    imageLoader = imageLoader
+                    imageLoader = imageLoader,
+                    coverSize = CoverSize.MEDIUM
                 )
             }
 

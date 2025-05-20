@@ -5,5 +5,5 @@ data class Book(
     val title: String,
     val authors: List<String>,
     val firstPublishedYear: String? = null,
-    val coverUrl: String?,
+    val coverId: Long?,
 )

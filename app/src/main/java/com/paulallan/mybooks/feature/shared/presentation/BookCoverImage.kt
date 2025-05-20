@@ -14,8 +14,9 @@ import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.paulallan.mybooks.domain.model.Book
 import com.paulallan.mybooks.R
+import com.paulallan.mybooks.domain.extentsion.toCoverUrl
+import com.paulallan.mybooks.domain.model.Book
 
 @Composable
 fun BookCoverImage(
@@ -23,11 +24,12 @@ fun BookCoverImage(
     coverWidth: Int,
     coverHeight: Int,
     contentScale: ContentScale = ContentScale.Crop,
-    imageLoader: ImageLoader
+    imageLoader: ImageLoader,
+    coverSize: CoverSize = CoverSize.LARGE
 ) {
     SubcomposeAsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
-            .data(book.coverUrl)
+            .data(book.coverId?.toCoverUrl(coverSize))
             .crossfade(true)
             .size(width = coverWidth, height = coverHeight)
             .build(),

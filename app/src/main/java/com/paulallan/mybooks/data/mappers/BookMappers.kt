@@ -2,7 +2,6 @@ package com.paulallan.mybooks.data.mappers
 
 import com.paulallan.mybooks.data.model.BookListResponse
 import com.paulallan.mybooks.domain.extentsion.orUnknownKey
-import com.paulallan.mybooks.domain.extentsion.toCoverUrl
 import com.paulallan.mybooks.domain.model.Book
 import com.paulallan.mybooks.domain.model.BookListResult
 
@@ -14,7 +13,7 @@ fun BookListResponse.toBookListResult(): BookListResult {
             title = work.title ?: "",
             authors = work.authorNames,
             firstPublishedYear = work.firstPublishedYear?.toString() ?: "",
-            coverUrl = work.coverId?.toCoverUrl(),
+            coverId = work.coverId,
         )
     }
     return BookListResult(

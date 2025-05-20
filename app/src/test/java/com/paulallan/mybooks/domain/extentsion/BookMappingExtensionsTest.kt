@@ -1,7 +1,7 @@
 package com.paulallan.mybooks.domain.extentsion
 
-import org.junit.Test
 import org.junit.Assert.assertEquals
+import org.junit.Test
 
 class BookMappingExtensionsTest {
 
@@ -32,7 +32,31 @@ class BookMappingExtensionsTest {
     }
 
     @Test
-    fun `toCoverUrl returns correct URL format when not null`() {
+    fun `toCoverUrl returns correct URL format with LARGE size when not null`() {
+        // Arrange
+        val coverId: Long = 12345
+
+        // Act
+        val result = coverId.toCoverUrl(CoverSize.LARGE)
+
+        // Assert
+        assertEquals("https://covers.openlibrary.org/b/id/12345-L.jpg", result)
+    }
+
+    @Test
+    fun `toCoverUrl returns correct URL format with MEDIUM size when not null`() {
+        // Arrange
+        val coverId: Long = 12345
+
+        // Act
+        val result = coverId.toCoverUrl(CoverSize.MEDIUM)
+
+        // Assert
+        assertEquals("https://covers.openlibrary.org/b/id/12345-M.jpg", result)
+    }
+
+    @Test
+    fun `toCoverUrl uses LARGE size by default when not specified`() {
         // Arrange
         val coverId: Long = 12345
 
