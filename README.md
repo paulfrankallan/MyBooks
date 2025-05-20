@@ -8,7 +8,7 @@ MyBooks is an Android application that displays a list of books from the OpenLib
   <tr>
     <td><img src="books.png" alt="Book List Screen" width="300"/></td>
     <td><img src="details.png" alt="Book Details Screen" width="300"/></td>
-    <td><img src="loading.png" alt="Loading Screen" width="300"/></td>
+    <td><img src="Loading.png" alt="Loading Screen" width="300"/></td>
   </tr>
 </table>
 
