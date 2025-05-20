@@ -1,5 +1,6 @@
 package com.paulallan.mybooks.domain.extentsion
 
+import com.paulallan.mybooks.feature.shared.presentation.CoverSize
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

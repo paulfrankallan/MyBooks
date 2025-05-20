@@ -10,10 +10,22 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.schedulers.Schedulers
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import javax.inject.Qualifier
 import javax.inject.Singleton
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class IoScheduler
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class MainScheduler
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -47,5 +59,19 @@ object AppModule {
     @Singleton
     fun provideBookRepository(apiService: ApiService): BookRepository {
         return BookRepositoryImpl(apiService)
+    }
+
+    @Provides
+    @Singleton
+    @IoScheduler
+    fun provideIoScheduler(): Scheduler {
+        return Schedulers.io()
+    }
+
+    @Provides
+    @Singleton
+    @MainScheduler
+    fun provideMainScheduler(): Scheduler {
+        return AndroidSchedulers.mainThread()
     }
 }

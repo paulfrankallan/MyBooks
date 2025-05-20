@@ -42,6 +42,10 @@ fun BookListScreen(
 
     val state by viewModel.state.collectAsState()
 
+    LaunchedEffect(key1 = Unit) {
+        viewModel.loadBooks()
+    }
+
     BookListContent(
         modifier = modifier,
         state = state,
