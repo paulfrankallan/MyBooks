@@ -1,4 +1,4 @@
-package com.paulallan.mybooks.ui.theme
+package com.paulallan.mybooks.app.theme
 
 import androidx.compose.ui.graphics.Color
 

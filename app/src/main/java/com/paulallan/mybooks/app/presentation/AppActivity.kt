@@ -1,4 +1,4 @@
-package com.paulallan.mybooks
+package com.paulallan.mybooks.app.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.paulallan.mybooks.ui.theme.MyBooksTheme
+import com.paulallan.mybooks.app.theme.MyBooksTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
