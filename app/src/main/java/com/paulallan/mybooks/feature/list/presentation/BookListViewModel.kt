@@ -1,6 +1,9 @@
 package com.paulallan.mybooks.feature.list.presentation
 
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import com.paulallan.mybooks.data.api.ApiConstants
 import com.paulallan.mybooks.domain.model.Book
 import com.paulallan.mybooks.domain.model.BookListType
 import com.paulallan.mybooks.domain.usecase.GetAlreadyReadBooksUseCase
@@ -8,6 +11,7 @@ import com.paulallan.mybooks.domain.usecase.GetCurrentlyReadingBooksUseCase
 import com.paulallan.mybooks.domain.usecase.GetWantToReadBooksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,41 +24,51 @@ class BookListViewModel @Inject constructor(
     private val getWantToReadBooksUseCase: GetWantToReadBooksUseCase,
     private val getCurrentlyReadingBooksUseCase: GetCurrentlyReadingBooksUseCase,
     private val getAlreadyReadBooksUseCase: GetAlreadyReadBooksUseCase,
-) : ViewModel() {
+) : ViewModel(), DefaultLifecycleObserver {
     private val _state = MutableStateFlow(BookListState())
     val state: StateFlow<BookListState> = _state.asStateFlow()
 
+    private val disposables = CompositeDisposable()
+
     init {
-        loadBooksForCurrentType()
+        loadBooks()
     }
 
-    private fun loadBooksForCurrentType() {
-        val disposable = when (_state.value.bookListType) {
-            BookListType.WANT_TO_READ -> getWantToReadBooksUseCase()
-            BookListType.CURRENTLY_READING -> getCurrentlyReadingBooksUseCase()
-            BookListType.ALREADY_READ -> getAlreadyReadBooksUseCase()
-        }.subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { result ->
-                    _state.update { currentState ->
-                        currentState.copy(
-                            books = result.books,
-                        )
-                    }
-                },
-                { error: Throwable ->
-                    // Handle error
-                }
+    override fun onStart(owner: LifecycleOwner) {
+        if (_state.value.books.isEmpty()) {
+            loadBooks()
+        }
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        disposables.clear()
+    }
+
+    fun loadBooks() {
+        _state.update {
+            it.copy(
+                isLoading = true,
+                error = null,
+                books = emptyList(),
+                currentPage = 1,
+                hasMoreData = true
             )
+        }
+
+        loadBooksForCurrentType(1)
     }
 
-    fun selectBook(book: Book) {
-        _state.update { it.copy(selectedBook = book) }
-    }
+    fun loadMoreBooks() {
+        val currentState = _state.value
 
-    fun clearSelectedBook() {
-        _state.update { it.copy(selectedBook = null) }
+        if (currentState.isLoading || currentState.isLoadingMore || currentState.hasNoMoreData) {
+            return
+        }
+
+        _state.update { it.copy(isLoadingMore = true) }
+
+        val nextPage = currentState.currentPage + 1
+        loadBooksForCurrentType(nextPage, isLoadingMore = true)
     }
 
     fun changeBookListType(type: BookListType) {
@@ -70,5 +84,66 @@ class BookListViewModel @Inject constructor(
         }
 
         loadBooksForCurrentType()
+    }
+
+    private fun loadBooksForCurrentType(page: Int = 1, isLoadingMore: Boolean = false) {
+        val disposable = when (_state.value.bookListType) {
+            BookListType.WANT_TO_READ -> getWantToReadBooksUseCase(ApiConstants.DEFAULT_PAGE_SIZE, page)
+            BookListType.CURRENTLY_READING -> getCurrentlyReadingBooksUseCase(ApiConstants.DEFAULT_PAGE_SIZE, page)
+            BookListType.ALREADY_READ -> getAlreadyReadBooksUseCase(ApiConstants.DEFAULT_PAGE_SIZE, page)
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { result -> onBooksLoaded(result.books, result.totalCount, page, isLoadingMore) },
+                { error: Throwable -> onError(error) }
+            )
+
+        disposables.add(disposable)
+    }
+
+    fun selectBook(book: Book) {
+        _state.update { it.copy(selectedBook = book) }
+    }
+
+    fun clearSelectedBook() {
+        _state.update { it.copy(selectedBook = null) }
+    }
+
+    private fun onBooksLoaded(books: List<Book>, totalCount: Int, page: Int, isLoadingMore: Boolean) {
+        _state.update { currentState ->
+            val updatedBooks = if (isLoadingMore) {
+                currentState.books + books
+            } else {
+                books
+            }
+
+            val totalBooksLoaded = updatedBooks.size
+            val hasMoreData = totalBooksLoaded < totalCount
+
+            currentState.copy(
+                books = updatedBooks,
+                isLoading = false,
+                isLoadingMore = false,
+                currentPage = page,
+                hasMoreData = hasMoreData,
+                totalCount = totalCount
+            )
+        }
+    }
+
+    private fun onError(error: Throwable) {
+        _state.update {
+            it.copy(
+                error = error.message,
+                isLoading = false,
+                isLoadingMore = false
+            )
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        disposables.clear()
     }
 }

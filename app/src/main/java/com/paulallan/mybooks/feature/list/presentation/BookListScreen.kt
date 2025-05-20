@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -17,9 +20,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -53,23 +58,25 @@ fun BookListScreen(
     val state by viewModel.state.collectAsState()
 
     BookListContent(
+        modifier = modifier,
         state = state,
-        onBookClick = viewModel::selectBook,
-        onBookListTypeSelected = viewModel::changeBookListType,
-        onDismissBottomSheet = viewModel::clearSelectedBook,
         imageLoader = imageLoader,
-        modifier = modifier
+        onBookClick = viewModel::selectBook,
+        onDismissBottomSheet = viewModel::clearSelectedBook,
+        onBookListTypeSelected = viewModel::changeBookListType,
+        onLoadMore = viewModel::loadMoreBooks
     )
 }
 
 @Composable
-fun BookListContent(
+private fun BookListContent(
+    modifier: Modifier = Modifier,
     state: BookListState,
-    onBookClick: (Book) -> Unit,
-    onBookListTypeSelected: (BookListType) -> Unit,
-    onDismissBottomSheet: () -> Unit,
     imageLoader: ImageLoader,
-    modifier: Modifier = Modifier
+    onBookClick: (Book) -> Unit,
+    onDismissBottomSheet: () -> Unit,
+    onBookListTypeSelected: (BookListType) -> Unit,
+    onLoadMore: () -> Unit
 ) {
     Scaffold(
         containerColor = Color.Transparent,
@@ -104,19 +111,74 @@ fun BookListContent(
                     onTypeSelected = onBookListTypeSelected,
                     modifier = Modifier.fillMaxWidth()
                 )
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    items(
-                        state.books,
-                    ) { book ->
-                        BookListItem(
-                            book = book,
-                            imageLoader = imageLoader,
-                            onClick = { onBookClick(book) }
-                        )
+
+                when {
+                    state.isLoading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                    state.error != null -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.error_message, state.error),
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                    else -> {
+                        Box(modifier = Modifier.weight(1f)) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 12.dp)
+                            ) {
+                                items(state.books) { book ->
+                                    BookListItem(
+                                        book = book,
+                                        imageLoader = imageLoader,
+                                        onClick = { onBookClick(book) }
+                                    )
+                                }
+
+                                if (!state.isLoading && !state.isLoadingMore && state.hasMoreData) {
+                                    item {
+                                        LaunchedEffect(key1 = true) {
+                                            onLoadMore()
+                                        }
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(1.dp)
+                                        )
+                                    }
+                                }
+                            }
+
+                            if (state.isLoadingMore) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(48.dp),
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -163,6 +225,7 @@ fun BookListScreenPreview() {
             onBookClick = {},
             onBookListTypeSelected = {},
             onDismissBottomSheet = {},
+            onLoadMore = {},
             imageLoader = Coil.imageLoader(LocalContext.current),
             modifier = Modifier.fillMaxSize()
         )
