@@ -20,12 +20,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.paulallan.mybooks.R
 import com.paulallan.mybooks.app.theme.MyBooksTheme
 
 @Composable
-fun BookListScreen(modifier: Modifier = Modifier) {
-    BookListContent()
+fun BookListScreen(
+    modifier: Modifier = Modifier,
+    viewModel: BookListViewModel = hiltViewModel()
+) {
+    BookListContent(modifier = modifier)
 }
 
 @Composable

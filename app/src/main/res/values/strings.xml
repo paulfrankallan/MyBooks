@@ -4,4 +4,9 @@
     
     <!-- Book List Screen -->
     <string name="books_title">My Books</string>
+    
+    <!-- Book List Type -->
+    <string name="book_list_type_want_to_read">Want to Read</string>
+    <string name="book_list_type_currently_reading">Currently Reading</string>
+    <string name="book_list_type_already_read">Already Read</string>
 </resources>
