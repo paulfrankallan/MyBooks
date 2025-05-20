@@ -4,6 +4,14 @@
 
 MyBooks is an Android application that displays a list of books from the OpenLibrary API. 
 
+<table>
+  <tr>
+    <td><img src="books.png" alt="Book List Screen" width="300"/></td>
+    <td><img src="details.png" alt="Book Details Screen" width="300"/></td>
+    <td><img src="loading.png" alt="Loading Screen" width="300"/></td>
+  </tr>
+</table>
+
  - The app demonstrates a robust implementation of the MVVM architecture and effective use of modern Android development technologies. 
  - The application allows users to browse different categories of books (Want to Read, Currently Reading, Already Read) in a scrollable list. 
  - Each book item displays the cover image, title, and author. 
