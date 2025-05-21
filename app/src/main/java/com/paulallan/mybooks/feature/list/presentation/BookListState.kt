@@ -12,7 +12,8 @@ data class BookListState(
     val bookListType: BookListType = BookListType.WANT_TO_READ,
     val currentPage: Int = 1,
     val hasMoreData: Boolean = true,
-    val totalCount: Int = 0
+    val totalCount: Int = 0,
+    val hasLoaded: Boolean = false,
 ) {
     val hasNoMoreData: Boolean
         get() = !hasMoreData

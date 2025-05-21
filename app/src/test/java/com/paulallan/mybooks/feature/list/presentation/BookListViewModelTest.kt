@@ -70,6 +70,9 @@ class BookListViewModelTest {
 
         every { getWantToReadBooksUseCase(any(), 1) } returns Single.just(bookListResult)
 
+        // Initial hasLoaded state should be false
+        assertFalse(viewModel.state.value.hasLoaded)
+
         // Act
         viewModel.loadBooks()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -81,6 +84,9 @@ class BookListViewModelTest {
         assert(viewModel.state.value.currentPage == 1)
         assertFalse(viewModel.state.value.hasMoreData)
         assertTrue(viewModel.state.value.hasNoMoreData)
+
+        // hasLoaded should remain unchanged by loadBooks
+        assertFalse(viewModel.state.value.hasLoaded)
     }
 
     @Test
@@ -88,6 +94,9 @@ class BookListViewModelTest {
         // Arrange
         val errorMessage = "Error loading books"
         every { getWantToReadBooksUseCase(any(), 1) } returns Single.error(RuntimeException(errorMessage))
+
+        // Initial hasLoaded state should be false
+        assertFalse(viewModel.state.value.hasLoaded)
 
         // Act
         viewModel.loadBooks()
@@ -97,6 +106,9 @@ class BookListViewModelTest {
         assert(viewModel.state.value.books.isEmpty())
         assert(!viewModel.state.value.isLoading)
         assert(viewModel.state.value.error == errorMessage)
+
+        // hasLoaded should remain unchanged by loadBooks, even on error
+        assertFalse(viewModel.state.value.hasLoaded)
     }
 
     @Test
@@ -202,6 +214,9 @@ class BookListViewModelTest {
         every { getWantToReadBooksUseCase(any(), 1) } returns Single.just(wantToReadResult)
         every { getCurrentlyReadingBooksUseCase(any(), 1) } returns Single.just(currentlyReadingResult)
 
+        // Initial hasLoaded state should be false
+        assertFalse(viewModel.state.value.hasLoaded)
+
         // Act - First load the default type (WANT_TO_READ)
         viewModel.loadBooks()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -210,6 +225,9 @@ class BookListViewModelTest {
         assert(viewModel.state.value.bookListType == BookListType.WANT_TO_READ)
         assert(viewModel.state.value.books == wantToReadBooks)
 
+        // hasLoaded should still be false after loadBooks
+        assertFalse(viewModel.state.value.hasLoaded)
+
         // Act - Change the book list type
         viewModel.changeBookListType(BookListType.CURRENTLY_READING)
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
@@ -217,6 +235,9 @@ class BookListViewModelTest {
         // Assert updated state
         assert(viewModel.state.value.bookListType == BookListType.CURRENTLY_READING)
         assert(viewModel.state.value.books == currentlyReadingBooks)
+
+        // hasLoaded should be set to true by changeBookListType
+        assertTrue(viewModel.state.value.hasLoaded)
 
         // Verify both use cases were called
         verify { getWantToReadBooksUseCase(any(), 1) }
@@ -248,7 +269,7 @@ class BookListViewModelTest {
     }
 
     @Test
-    fun `onStart should load books when books list is empty`() {
+    fun `triggerInitialLoadIfNeeded should load books when hasLoaded is false`() {
         // Arrange
         val books = listOf(
             Book(
@@ -263,18 +284,19 @@ class BookListViewModelTest {
 
         every { getWantToReadBooksUseCase(any(), 1) } returns Single.just(bookListResult)
 
-        // Act - Trigger onStart
-        viewModel.onStart(lifecycleOwner)
+        // Act - Trigger initial load
+        viewModel.triggerInitialLoadIfNeeded()
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
         // Assert
         assert(viewModel.state.value.books == books)
+        assert(viewModel.state.value.hasLoaded)
         verify { getWantToReadBooksUseCase(any(), 1) }
     }
 
     @Test
-    fun `onStop should clear disposables`() {
-        // Arrange - Set up a long-running operation
+    fun `triggerInitialLoadIfNeeded should not load books when hasLoaded is true`() {
+        // Arrange
         val books = listOf(
             Book(
                 id = "1",
@@ -286,19 +308,20 @@ class BookListViewModelTest {
         )
         val bookListResult = BookListResult(books, 1)
 
-        // Use a Single that won't complete immediately
-        every { getWantToReadBooksUseCase(any(), 1) } returns Single.just(bookListResult).delay(10, TimeUnit.SECONDS, testScheduler)
+        every { getWantToReadBooksUseCase(any(), 1) } returns Single.just(bookListResult)
 
-        // Start loading
-        viewModel.loadBooks()
+        // First call to set hasLoaded to true
+        viewModel.triggerInitialLoadIfNeeded()
+        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
-        // Act - Call onStop before the operation completes
-        viewModel.onStop(lifecycleOwner)
+        // Reset the mock to verify it's not called again
+        verify(exactly = 1) { getWantToReadBooksUseCase(any(), 1) }
 
-        // Advance time to when the operation would have completed
-        testScheduler.advanceTimeBy(10, TimeUnit.SECONDS)
+        // Act - Call triggerInitialLoadIfNeeded again
+        viewModel.triggerInitialLoadIfNeeded()
+        testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
-        // Assert - State should still show loading since the operation was disposed
-        assert(viewModel.state.value.isLoading)
+        // Assert - Verify the use case was only called once (not again on second call)
+        verify(exactly = 1) { getWantToReadBooksUseCase(any(), 1) }
     }
 }

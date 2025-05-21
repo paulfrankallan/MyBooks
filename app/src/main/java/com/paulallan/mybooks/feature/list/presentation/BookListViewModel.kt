@@ -1,7 +1,5 @@
 package com.paulallan.mybooks.feature.list.presentation
 
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import com.paulallan.mybooks.app.di.IoScheduler
 import com.paulallan.mybooks.app.di.MainScheduler
@@ -27,15 +25,34 @@ class BookListViewModel @Inject constructor(
     private val getAlreadyReadBooksUseCase: GetAlreadyReadBooksUseCase,
     @IoScheduler private val subscribeScheduler: Scheduler,
     @MainScheduler private val observeScheduler: Scheduler
-) : ViewModel(), DefaultLifecycleObserver {
+) : ViewModel() {
+
     private val _state = MutableStateFlow(BookListState())
     val state: StateFlow<BookListState> = _state.asStateFlow()
 
     private val disposables = CompositeDisposable()
 
     /**
-     * Loads the next page of books when user scrolls to the end of the list.
-     * Prevents multiple simultaneous loading requests and respects pagination limits.
+     * Triggers the initial loading of books if it has not already occurred.
+     *
+     * This function ensures that books are only loaded once during the initial ViewModel lifecycle,
+     * preventing duplicate loads on configuration changes. It sets the hasLoaded flag and initiates loading.
+     */
+    fun triggerInitialLoadIfNeeded() {
+        // This is to address an issue with recalling the loadBooks function when there is a configuration change.
+        // This could also be fixed by triggering loadBooks in ViewModel by using the onStart and stateIn flow operators.
+        // However, each have their pros & cons, this is a simpler solution for now.
+        if (!_state.value.hasLoaded) {
+            _state.update { it.copy(hasLoaded = true) }
+            loadBooks()
+        }
+    }
+
+    /**
+     * Loads the next page of books for pagination.
+     *
+     * This function checks if a load operation is already in progress or if there is no more data to load.
+     * If not, it updates the state to indicate loading more data and fetches the next page of books.
      */
     fun loadMoreBooks() {
         val currentState = _state.value
@@ -53,7 +70,7 @@ class BookListViewModel @Inject constructor(
     /**
      * Switches between different book list types (Want to Read, Currently Reading, Already Read).
      * Resets the list state and loads books for the selected type.
-     * 
+     *
      * @param type The book list type to switch to
      */
     fun changeBookListType(type: BookListType) {
@@ -71,7 +88,8 @@ class BookListViewModel @Inject constructor(
                 error = null,
                 currentPage = 1,
                 hasMoreData = true,
-                totalCount = 0
+                totalCount = 0,
+                hasLoaded = true
             )
         }
 
@@ -80,7 +98,7 @@ class BookListViewModel @Inject constructor(
 
     /**
      * Sets the currently selected book in the state.
-     * 
+     *
      * @param book The book to be selected
      */
     fun selectBook(book: Book) {
@@ -117,7 +135,7 @@ class BookListViewModel @Inject constructor(
     /**
      * Fetches books for the currently selected list type from the appropriate use case.
      * Handles subscription management and processes the results.
-     * 
+     *
      * @param page The page number to load (defaults to 1)
      * @param isLoadingMore Whether this is a pagination request (defaults to false)
      */
@@ -140,7 +158,7 @@ class BookListViewModel @Inject constructor(
     /**
      * Processes the loaded books data and updates the state accordingly.
      * Handles both initial loading and pagination by appending new books to existing ones when needed.
-     * 
+     *
      * @param books The list of books loaded from the repository
      * @param totalCount The total number of books available in the repository
      * @param page The current page that was loaded
@@ -172,7 +190,7 @@ class BookListViewModel @Inject constructor(
     /**
      * Handles errors that occur during book loading operations.
      * Updates the state with the error message and resets loading indicators.
-     * 
+     *
      * @param error The error that occurred during the operation
      */
     private fun onError(error: Throwable) {
@@ -180,31 +198,9 @@ class BookListViewModel @Inject constructor(
             it.copy(
                 error = error.message,
                 isLoading = false,
-                isLoadingMore = false,
+                isLoadingMore = false
             )
         }
-    }
-
-    /**
-     * Lifecycle callback when the associated UI becomes visible.
-     * Automatically loads books if the list is empty.
-     * 
-     * @param owner The LifecycleOwner to which this observer is attached
-     */
-    override fun onStart(owner: LifecycleOwner) {
-        if (_state.value.books.isEmpty()) {
-            loadBooks()
-        }
-    }
-
-    /**
-     * Lifecycle callback when the associated UI is no longer visible.
-     * Clears any ongoing network requests to prevent memory leaks.
-     * 
-     * @param owner The LifecycleOwner to which this observer is attached
-     */
-    override fun onStop(owner: LifecycleOwner) {
-        disposables.clear()
     }
 
     /**
