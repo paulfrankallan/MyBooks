@@ -84,8 +84,8 @@ The application follows a clean architecture approach with three main layers:
 
 ## Trade-offs
 
-### Modulariation
-- The application uses a package-by-feature architecture rather than a fully modularied approach
+### Modularisation
+- The application uses a package-by-feature architecture rather than a fully modularised approach
 - This was a conscious decision for a small demo app, but would be reconsidered for a larger application
 - Benefits: Simpler build configuration, faster build times for a small app
 - Drawbacks: Less enforced separation of concerns, potential for feature coupling
@@ -102,7 +102,7 @@ The application follows a clean architecture approach with three main layers:
 ## Suggestions for Improvements
 
 ### Architecture
-- Implement a fully modularied architecture for better scalability
+- Implement a fully modularised architecture for better scalability
 - Treat Book Details bottom sheet as it's own screen and provide it's own ViewModel
 - Share common code  or state handling across ViewModels/Repositories; to reduce duplicate and boilerplate code (BaseViewModel etc) 
 - Add a local database for offline support using Room
