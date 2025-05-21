@@ -51,8 +51,10 @@ The application follows a clean architecture approach with three main layers:
 - **Domain Layer**: Use cases, repository interfaces, and domain models
 - **Data Layer**: Repository implementations, API services, and data models
 
-- In a larger production application, the architecture would be fully modularized with separate modules for each feature and shared components.
-- Data and Domain layers would also be pushed into their relevant feature modules where necessary.
+In a larger production application:
+- the architecture could be fully modularized with separate modules for each feature and shared components.
+- Data and Domain layers could also be pushed into their relevant feature modules where necessary.
+- A nav graph could be used to nav between screens, passing identifiers to load data appropriately.
 
 ### State Management
 - Using Kotlin Flow for UI state management
@@ -79,7 +81,7 @@ The application follows a clean architecture approach with three main layers:
 - Images sizes are chosen based on the UI component; medium for smaller list item images and large for book details view.
 
 ### ViewModels
- - I considered treating the details bottom sheet as it's own screen with it's own view model. I decided that for a small coding challenge, over-engineering with a separate ViewModel is unnecessary. 
+ - I considered treating the details bottom sheet as it's own screen with it's own view model. I decided that for a small coding challenge with one screen and a Bottom Sheet, over-engineering with a nav setup and separate ViewModel is unnecessary. 
 
 
 ## Trade-offs
