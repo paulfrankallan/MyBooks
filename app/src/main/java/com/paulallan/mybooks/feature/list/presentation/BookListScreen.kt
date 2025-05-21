@@ -42,6 +42,8 @@ fun BookListScreen(
 
     val state by viewModel.state.collectAsState()
 
+    // This has an issue with recalling the function when there is a configuration change.
+    // TODO: Fix this by loading the books in the ViewModel by using the onStart and stateIn flow operators
     LaunchedEffect(key1 = Unit) {
         viewModel.loadBooks()
     }
