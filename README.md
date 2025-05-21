@@ -78,10 +78,14 @@ The application follows a clean architecture approach with three main layers:
 - Consideration was given to ensuring long-running tasks are performed off the main thread
 - Images sizes are chosen based on the UI component; medium for smaller list item images and large for book details view.
 
+### ViewModels
+ - I considered treating the details bottom sheet as it's own screen with it's own view model. I decided that for a small coding challenge, over-engineering with a separate ViewModel is unnecessary. 
+
+
 ## Trade-offs
 
-### Modularization
-- The application uses a package-by-feature architecture rather than a fully modularized approach
+### Modulariation
+- The application uses a package-by-feature architecture rather than a fully modularied approach
 - This was a conscious decision for a small demo app, but would be reconsidered for a larger application
 - Benefits: Simpler build configuration, faster build times for a small app
 - Drawbacks: Less enforced separation of concerns, potential for feature coupling
@@ -98,7 +102,7 @@ The application follows a clean architecture approach with three main layers:
 ## Suggestions for Improvements
 
 ### Architecture
-- Implement a fully modularized architecture for better scalability
+- Implement a fully modularied architecture for better scalability
 - Treat Book Details bottom sheet as it's own screen and provide it's own ViewModel
 - Share common code  or state handling across ViewModels/Repositories; to reduce duplicate and boilerplate code (BaseViewModel etc) 
 - Add a local database for offline support using Room
