@@ -33,6 +33,10 @@ class BookListViewModel @Inject constructor(
 
     private val disposables = CompositeDisposable()
 
+    /**
+     * Loads the next page of books when user scrolls to the end of the list.
+     * Prevents multiple simultaneous loading requests and respects pagination limits.
+     */
     fun loadMoreBooks() {
         val currentState = _state.value
 
@@ -46,6 +50,12 @@ class BookListViewModel @Inject constructor(
         loadBooksForCurrentType(nextPage, isLoadingMore = true)
     }
 
+    /**
+     * Switches between different book list types (Want to Read, Currently Reading, Already Read).
+     * Resets the list state and loads books for the selected type.
+     * 
+     * @param type The book list type to switch to
+     */
     fun changeBookListType(type: BookListType) {
         if (_state.value.bookListType == type) {
             return
@@ -68,14 +78,26 @@ class BookListViewModel @Inject constructor(
         loadBooksForCurrentType(1)
     }
 
+    /**
+     * Sets the currently selected book in the state.
+     * 
+     * @param book The book to be selected
+     */
     fun selectBook(book: Book) {
         _state.update { it.copy(selectedBook = book) }
     }
 
+    /**
+     * Clears the currently selected book from the state.
+     */
     fun clearSelectedBook() {
         _state.update { it.copy(selectedBook = null) }
     }
 
+    /**
+     * Resets the book list state and loads the first page of books for the current list type.
+     * Used for initial loading and initial loading after switching BookListType.
+     */
     fun loadBooks() {
         disposables.clear()
 
@@ -92,6 +114,13 @@ class BookListViewModel @Inject constructor(
         loadBooksForCurrentType(1)
     }
 
+    /**
+     * Fetches books for the currently selected list type from the appropriate use case.
+     * Handles subscription management and processes the results.
+     * 
+     * @param page The page number to load (defaults to 1)
+     * @param isLoadingMore Whether this is a pagination request (defaults to false)
+     */
     fun loadBooksForCurrentType(page: Int = 1, isLoadingMore: Boolean = false) {
         val disposable = when (_state.value.bookListType) {
             BookListType.WANT_TO_READ -> getWantToReadBooksUseCase(ApiConstants.DEFAULT_PAGE_SIZE, page)
@@ -108,6 +137,15 @@ class BookListViewModel @Inject constructor(
         disposables.add(disposable)
     }
 
+    /**
+     * Processes the loaded books data and updates the state accordingly.
+     * Handles both initial loading and pagination by appending new books to existing ones when needed.
+     * 
+     * @param books The list of books loaded from the repository
+     * @param totalCount The total number of books available in the repository
+     * @param page The current page that was loaded
+     * @param isLoadingMore Whether this was a pagination request
+     */
     private fun onBooksLoaded(books: List<Book>, totalCount: Int, page: Int, isLoadingMore: Boolean) {
         _state.update { currentState ->
             val updatedBooks = if (isLoadingMore) {
@@ -131,6 +169,12 @@ class BookListViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Handles errors that occur during book loading operations.
+     * Updates the state with the error message and resets loading indicators.
+     * 
+     * @param error The error that occurred during the operation
+     */
     private fun onError(error: Throwable) {
         _state.update {
             it.copy(
@@ -141,16 +185,32 @@ class BookListViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Lifecycle callback when the associated UI becomes visible.
+     * Automatically loads books if the list is empty.
+     * 
+     * @param owner The LifecycleOwner to which this observer is attached
+     */
     override fun onStart(owner: LifecycleOwner) {
         if (_state.value.books.isEmpty()) {
             loadBooks()
         }
     }
 
+    /**
+     * Lifecycle callback when the associated UI is no longer visible.
+     * Clears any ongoing network requests to prevent memory leaks.
+     * 
+     * @param owner The LifecycleOwner to which this observer is attached
+     */
     override fun onStop(owner: LifecycleOwner) {
         disposables.clear()
     }
 
+    /**
+     * Called when the ViewModel is being destroyed.
+     * Ensures all resources are properly released.
+     */
     override fun onCleared() {
         super.onCleared()
         disposables.clear()
