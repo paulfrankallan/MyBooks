@@ -20,13 +20,12 @@ import com.paulallan.mybooks.feature.shared.presentation.CoverSize
 
 @Composable
 fun BookListItem(
-    modifier: Modifier = Modifier,
     book: Book,
     imageLoader: ImageLoader,
     onClick: () -> Unit
 ) {
     Card(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable(onClick = onClick),

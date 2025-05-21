@@ -142,7 +142,6 @@ private fun BookListContent(
                                     key = { book -> book.id }
                                 ) { book ->
                                     BookListItem(
-                                        modifier = Modifier,
                                         book = book,
                                         imageLoader = imageLoader,
                                         onClick = { onBookClick(book) }
@@ -151,7 +150,7 @@ private fun BookListContent(
 
                                 if (state.canLoadMore) {
                                     item {
-                                        LaunchedEffect(key1 = state.canLoadMore) {
+                                        LaunchedEffect(key1 = true) {
                                             onLoadMore()
                                         }
                                         Box(
@@ -182,7 +181,6 @@ private fun BookListContent(
 
             state.selectedBook?.let { book ->
                 BookDetailsBottomSheet(
-                    modifier = Modifier,
                     book = book,
                     imageLoader = imageLoader,
                     onDismissBottomSheet = onDismissBottomSheet,

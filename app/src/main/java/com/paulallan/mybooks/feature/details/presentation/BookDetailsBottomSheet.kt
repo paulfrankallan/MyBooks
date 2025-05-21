@@ -21,21 +21,18 @@ import com.paulallan.mybooks.feature.shared.presentation.CoverSize
 @ExperimentalMaterial3Api
 @Composable
 fun BookDetailsBottomSheet(
-    modifier: Modifier = Modifier,
-    book: Book,
     imageLoader: ImageLoader,
     onDismissBottomSheet: () -> Unit,
+    book: Book,
 ) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
     ModalBottomSheet(
-        modifier = modifier,
         onDismissRequest = onDismissBottomSheet,
         sheetState = sheetState
     ) {
         BookDetailContent(
-            modifier = Modifier,
             book = book,
             imageLoader = imageLoader,
         )
@@ -44,12 +41,11 @@ fun BookDetailsBottomSheet(
 
 @Composable
 private fun BookDetailContent(
-    modifier: Modifier = Modifier,
     book: Book,
     imageLoader: ImageLoader,
 ) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(24.dp)
     ) {
@@ -123,7 +119,6 @@ fun BookDetailsBottomSheetPreview() {
         firstPublishedYear = "1925"
     )
     BookDetailContent(
-        modifier = Modifier,
         book = dummyBook,
         imageLoader = imageLoader
     )
