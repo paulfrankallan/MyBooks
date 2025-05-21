@@ -99,6 +99,8 @@ The application follows a clean architecture approach with three main layers:
 
 ### Architecture
 - Implement a fully modularized architecture for better scalability
+- Treat Book Details bottom sheet as it's own screen and provide it's own ViewModel
+- Share common code  or state handling across ViewModels/Repositories; to reduce duplicate and boilerplate code (BaseViewModel etc) 
 - Add a local database for offline support using Room
 - Implement a single source of truth pattern with repository mediators
 
