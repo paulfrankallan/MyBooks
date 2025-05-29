@@ -8,7 +8,6 @@ data class BookListState(
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
     val error: String? = null,
-    val selectedBook: Book? = null,
     val bookListType: BookListType = BookListType.WANT_TO_READ,
     val currentPage: Int = 1,
     val hasMoreData: Boolean = true,

@@ -16,44 +16,38 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil.Coil
 import coil.ImageLoader
 import com.paulallan.mybooks.R
-import com.paulallan.mybooks.app.di.ImageLoaderEntryPoint
 import com.paulallan.mybooks.app.theme.MyBooksTheme
 import com.paulallan.mybooks.domain.model.Book
 import com.paulallan.mybooks.domain.model.BookListType
-import com.paulallan.mybooks.feature.details.presentation.BookDetailsBottomSheet
-import dagger.hilt.android.EntryPointAccessors
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun BookListScreen(
     modifier: Modifier = Modifier,
-    viewModel: BookListViewModel = hiltViewModel()
+    onBookClick: (String) -> Unit = {},
+    viewModel: BookListViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
     val imageLoader = remember {
-        EntryPointAccessors.fromApplication(
-            context.applicationContext,
-            ImageLoaderEntryPoint::class.java
-        ).imageLoader()
+        Coil.imageLoader(context)
     }
 
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.loadBooks()
+        viewModel.processIntent(BookListIntent.LoadBooks)
     }
 
     BookListContent(
         modifier = modifier,
         state = state,
         imageLoader = imageLoader,
-        onBookClick = viewModel::selectBook,
-        onDismissBottomSheet = viewModel::clearSelectedBook,
-        onBookListTypeSelected = viewModel::changeBookListType,
-        onLoadMore = viewModel::loadMoreBooks
+        onBookClick = { book -> onBookClick(book.id) },
+        onBookListTypeSelected = { type -> viewModel.processIntent(BookListIntent.ChangeBookListType(type)) },
+        onLoadMore = { viewModel.processIntent(BookListIntent.LoadMoreBooks) }
     )
 }
 
@@ -63,7 +57,6 @@ private fun BookListContent(
     state: BookListState,
     imageLoader: ImageLoader,
     onBookClick: (Book) -> Unit,
-    onDismissBottomSheet: () -> Unit,
     onBookListTypeSelected: (BookListType) -> Unit,
     onLoadMore: () -> Unit
 ) {
@@ -180,14 +173,7 @@ private fun BookListContent(
                 }
             }
 
-            state.selectedBook?.let { book ->
-                BookDetailsBottomSheet(
-                    modifier = Modifier,
-                    book = book,
-                    imageLoader = imageLoader,
-                    onDismissBottomSheet = onDismissBottomSheet,
-                )
-            }
+            // Navigation to details screen is now handled by the NavHost
         }
     }
 }
@@ -222,7 +208,6 @@ fun BookListScreenPreview() {
             ),
             onBookClick = {},
             onBookListTypeSelected = {},
-            onDismissBottomSheet = {},
             onLoadMore = {},
             imageLoader = Coil.imageLoader(LocalContext.current),
             modifier = Modifier.fillMaxSize()

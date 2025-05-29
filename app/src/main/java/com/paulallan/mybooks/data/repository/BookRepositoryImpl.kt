@@ -5,9 +5,8 @@ import com.paulallan.mybooks.data.mappers.toBookListResult
 import com.paulallan.mybooks.domain.model.BookListResult
 import com.paulallan.mybooks.domain.repository.BookRepository
 import io.reactivex.rxjava3.core.Single
-import javax.inject.Inject
 
-class BookRepositoryImpl @Inject constructor(
+class BookRepositoryImpl(
     private val apiService: ApiService
 ) : BookRepository {
 
